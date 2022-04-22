@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Anuncio {
+  Jogo_id   Int     @id
+  titulo    String  @db.VarChar(45)
+  descricao String? @db.VarChar(255)
+  imagem    Bytes?  @db.Blob
+  Jogo      Jogo    @relation(fields: [Jogo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Anuncio_Jogo1")
+
+  @@index([Jogo_id], map: "fk_Anuncio_Jogo1_idx")
+}
+
+model Campo {
+  id                       Int         @id
+  nome                     String      @db.VarChar(45)
+  descricao                String      @db.VarChar(255)
+  preco_hora               Decimal     @db.Decimal(6, 2)
+  horario_de_funcionamento String      @db.VarChar(45)
+  CEP                      String      @db.Char(8)
+  Complemento              String      @db.VarChar(90)
+  Bairro                   String      @db.VarChar(45)
+  dono_CPF                 String      @db.Char(11)
+  Cidade_id                Int
+  Cidade                   Cidade      @relation(fields: [Cidade_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Campo_Cidade1")
+  DonoDeCampo              DonoDeCampo @relation(fields: [dono_CPF], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Campo_DonoDeCampo1")
+  Reserva                  Reserva[]
+  fotos                    fotos[]
+
+  @@index([Cidade_id], map: "fk_Campo_Cidade1_idx")
+  @@index([dono_CPF], map: "fk_Campo_DonoDeCampo1_idx")
+}
+
+model Cidade {
+  id      Int       @id
+  nome    String    @db.VarChar(45)
+  estado  String    @db.VarChar(45)
+  Campo   Campo[]
+  Joga_em Joga_em[]
+}
+
+model DonoDeCampo {
+  CPF   String  @id @db.Char(11)
+  nome  String  @db.VarChar(45)
+  foto  Bytes   @db.Blob
+  Campo Campo[]
+}
+
+model Joga_em {
+  Jogador_CPF String  @db.Char(11)
+  Cidade_id   Int
+  Cidade      Cidade  @relation(fields: [Cidade_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_has_Cidade_Cidade1")
+  Jogador     Jogador @relation(fields: [Jogador_CPF], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_has_Cidade_Jogador1")
+
+  @@id([Jogador_CPF, Cidade_id])
+  @@index([Cidade_id], map: "fk_Jogador_has_Cidade_Cidade1_idx")
+  @@index([Jogador_CPF], map: "fk_Jogador_has_Cidade_Jogador1_idx")
+  @@map("Joga em")
+}
+
+model Jogador {
+  CPF                      String                 @id @db.Char(11)
+  nome                     String                 @db.VarChar(45)
+  data_de_nascimento       DateTime               @db.Date
+  Ranking                  Int
+  foto                     Bytes?                 @db.Blob
+  Ranking_JogadorToRanking Ranking                @relation(fields: [Ranking], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_Ranking1")
+  Joga_em                  Joga_em[]
+  Reserva                  Reserva[]
+  Time                     Time[]
+  membro_de_time           membro_de_time[]
+  participacao_em_jogo     participacao_em_jogo[]
+
+  @@index([Ranking], map: "fk_Jogador_Ranking1_idx")
+}
+
+model Jogo {
+  id                                   Int                    @id
+  data_hora_inicio                     DateTime               @db.DateTime(0)
+  data_hora_termino                    DateTime               @db.DateTime(0)
+  Ranking_minimo                       Int
+  Ranking_maximo                       Int
+  Reserva_id                           Int
+  Ranking_Jogo_Ranking_maximoToRanking Ranking                @relation("Jogo_Ranking_maximoToRanking", fields: [Ranking_maximo], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogo_Ranking2")
+  Ranking_Jogo_Ranking_minimoToRanking Ranking                @relation("Jogo_Ranking_minimoToRanking", fields: [Ranking_minimo], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogo_Ranking1")
+  Reserva                              Reserva                @relation(fields: [Reserva_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogo_Reserva1")
+  Anuncio                              Anuncio?
+  participacao_em_jogo                 participacao_em_jogo[]
+
+  @@index([Ranking_minimo], map: "fk_Jogo_Ranking1_idx")
+  @@index([Ranking_maximo], map: "fk_Jogo_Ranking2_idx")
+  @@index([Reserva_id], map: "fk_Jogo_Reserva1_idx")
+}
+
+model Participacao_Torneio {
+  Torneio_id Int
+  Time_id    Int
+  Time       Time    @relation(fields: [Time_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_has_Time_Time1")
+  Torneio    Torneio @relation(fields: [Torneio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_has_Time_Torneio1")
+
+  @@id([Torneio_id, Time_id])
+  @@index([Time_id], map: "fk_Torneio_has_Time_Time1_idx")
+  @@index([Torneio_id], map: "fk_Torneio_has_Time_Torneio1_idx")
+}
+
+model Ranking {
+  nivel                                   Int       @id
+  nome                                    String    @db.VarChar(45)
+  descricao                               String    @db.VarChar(255)
+  Jogador                                 Jogador[]
+  Jogo_Jogo_Ranking_maximoToRanking       Jogo[]    @relation("Jogo_Ranking_maximoToRanking")
+  Jogo_Jogo_Ranking_minimoToRanking       Jogo[]    @relation("Jogo_Ranking_minimoToRanking")
+  Torneio_RankingToTorneio_Ranking_maximo Torneio[] @relation("RankingToTorneio_Ranking_maximo")
+  Torneio_RankingToTorneio_Ranking_minimo Torneio[] @relation("RankingToTorneio_Ranking_minimo")
+}
+
+model Reserva {
+  id                Int      @id
+  preco             Decimal  @db.Decimal(6, 2)
+  data_hora_inicio  DateTime @db.DateTime(0)
+  data_hora_termino DateTime @db.DateTime(0)
+  Campo_id          Int
+  reservador_CPF    String   @db.Char(11)
+  Campo             Campo    @relation(fields: [Campo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Reserva_Campo1")
+  Jogador           Jogador  @relation(fields: [reservador_CPF], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Reserva_Jogador1")
+  Jogo              Jogo[]
+
+  @@index([Campo_id], map: "fk_Reserva_Campo1_idx")
+  @@index([reservador_CPF], map: "fk_Reserva_Jogador1_idx")
+}
+
+model Time {
+  id                   Int                    @id
+  nome                 String                 @db.VarChar(45)
+  criador              String                 @db.Char(11)
+  Jogador              Jogador                @relation(fields: [criador], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Time_Jogador1")
+  Participacao_Torneio Participacao_Torneio[]
+  Torneio              Torneio[]
+  membro_de_time       membro_de_time[]
+
+  @@index([criador], map: "fk_Time_Jogador1_idx")
+}
+
+model Torneio {
+  id                                      Int                    @id
+  data_de_inicio                          DateTime               @db.Date
+  data_de_termino                         DateTime               @db.Date
+  descricao                               String                 @db.VarChar(255)
+  nome                                    String                 @db.VarChar(45)
+  Ranking_minimo                          Int
+  Ranking_maximo                          Int
+  Time_vencedor                           Int
+  formato                                 String                 @db.VarChar(45)
+  Ranking_RankingToTorneio_Ranking_maximo Ranking                @relation("RankingToTorneio_Ranking_maximo", fields: [Ranking_maximo], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_Ranking2")
+  Ranking_RankingToTorneio_Ranking_minimo Ranking                @relation("RankingToTorneio_Ranking_minimo", fields: [Ranking_minimo], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_Ranking1")
+  Time                                    Time                   @relation(fields: [Time_vencedor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_Time1")
+  formato_TorneioToformato                formato                @relation(fields: [formato], references: [nome], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_formato1")
+  Participacao_Torneio                    Participacao_Torneio[]
+
+  @@index([Ranking_minimo], map: "fk_Torneio_Ranking1_idx")
+  @@index([Ranking_maximo], map: "fk_Torneio_Ranking2_idx")
+  @@index([Time_vencedor], map: "fk_Torneio_Time1_idx")
+  @@index([formato], map: "fk_Torneio_formato1_idx")
+}
+
+model formato {
+  nome      String    @id @db.VarChar(45)
+  descricao String    @db.VarChar(255)
+  Torneio   Torneio[]
+}
+
+model fotos {
+  id       Int   @id
+  imagem   Bytes @db.Blob
+  Campo_id Int
+  Campo    Campo @relation(fields: [Campo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fotos_Campo")
+
+  @@index([Campo_id], map: "fk_fotos_Campo_idx")
+}
+
+model membro_de_time {
+  Time_id     Int
+  Jogador_CPF String  @db.Char(11)
+  Jogador     Jogador @relation(fields: [Jogador_CPF], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Time_has_Jogador_Jogador1")
+  Time        Time    @relation(fields: [Time_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Time_has_Jogador_Time1")
+
+  @@id([Time_id, Jogador_CPF])
+  @@index([Jogador_CPF], map: "fk_Time_has_Jogador_Jogador1_idx")
+  @@index([Time_id], map: "fk_Time_has_Jogador_Time1_idx")
+}
+
+model participacao_em_jogo {
+  Jogador_CPF String  @db.Char(11)
+  Jogo_id     Int
+  Jogador     Jogador @relation(fields: [Jogador_CPF], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_has_Jogo_Jogador1")
+  Jogo        Jogo    @relation(fields: [Jogo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_has_Jogo_Jogo1")
+
+  @@id([Jogador_CPF, Jogo_id])
+  @@index([Jogador_CPF], map: "fk_Jogador_has_Jogo_Jogador1_idx")
+  @@index([Jogo_id], map: "fk_Jogador_has_Jogo_Jogo1_idx")
+}
