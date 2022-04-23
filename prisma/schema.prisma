@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Anuncio {
-  Jogo_id   Int     @id
+  Jogo_id   Int     @id @default(autoincrement())
   titulo    String  @db.VarChar(45)
   descricao String? @db.VarChar(255)
   imagem    Bytes?  @db.Blob
@@ -18,7 +18,7 @@ model Anuncio {
 }
 
 model Campo {
-  id                       Int         @id
+  id                       Int         @id @default(autoincrement())
   nome                     String      @db.VarChar(45)
   descricao                String      @db.VarChar(255)
   preco_hora               Decimal     @db.Decimal(6, 2)
@@ -38,7 +38,7 @@ model Campo {
 }
 
 model Cidade {
-  id      Int       @id
+  id      Int       @id @default(autoincrement())
   nome    String    @db.VarChar(45)
   estado  String    @db.VarChar(45)
   Campo   Campo[]
@@ -48,7 +48,7 @@ model Cidade {
 model DonoDeCampo {
   CPF   String  @id @db.Char(11)
   nome  String  @db.VarChar(45)
-  foto  Bytes   @db.Blob
+  foto  Bytes?  @db.Blob
   Campo Campo[]
 }
 
@@ -81,7 +81,7 @@ model Jogador {
 }
 
 model Jogo {
-  id                                   Int                    @id
+  id                                   Int                    @id @default(autoincrement())
   data_hora_inicio                     DateTime               @db.DateTime(0)
   data_hora_termino                    DateTime               @db.DateTime(0)
   Ranking_minimo                       Int
@@ -121,7 +121,7 @@ model Ranking {
 }
 
 model Reserva {
-  id                Int      @id
+  id                Int      @id @default(autoincrement())
   preco             Decimal  @db.Decimal(6, 2)
   data_hora_inicio  DateTime @db.DateTime(0)
   data_hora_termino DateTime @db.DateTime(0)
@@ -136,7 +136,7 @@ model Reserva {
 }
 
 model Time {
-  id                   Int                    @id
+  id                   Int                    @id @default(autoincrement())
   nome                 String                 @db.VarChar(45)
   criador              String                 @db.Char(11)
   Jogador              Jogador                @relation(fields: [criador], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Time_Jogador1")
@@ -148,7 +148,7 @@ model Time {
 }
 
 model Torneio {
-  id                                      Int                    @id
+  id                                      Int                    @id @default(autoincrement())
   data_de_inicio                          DateTime               @db.Date
   data_de_termino                         DateTime               @db.Date
   descricao                               String                 @db.VarChar(255)
@@ -176,7 +176,7 @@ model formato {
 }
 
 model fotos {
-  id       Int   @id
+  id       Int   @id @default(autoincrement())
   imagem   Bytes @db.Blob
   Campo_id Int
   Campo    Campo @relation(fields: [Campo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fotos_Campo")
