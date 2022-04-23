@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { CreateJogadoreDto } from './dto/create-jogadore.dto';
 import { UpdateJogadoreDto } from './dto/update-jogadore.dto';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class JogadoresService {
-  create(createJogadoreDto: CreateJogadoreDto) {
-    return 'This action adds a new jogadore';
+  constructor(private prisma: PrismaService) {}
+  async create(createJogadoreDto: CreateJogadoreDto) {
+    return await this.prisma.jogador.create({data:createJogadoreDto});
   }
 
-  findAll() {
-    return `This action returns all jogadores`;
+  async findAll() {
+    return await this.prisma.jogador.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} jogadore`;
+  async findOne(cpf: string) {
+    return await this.prisma.jogador.findUnique({where: {CPF: cpf}})
   }
 
-  update(id: number, updateJogadoreDto: UpdateJogadoreDto) {
-    return `This action updates a #${id} jogadore`;
+  async update(cpf: string, updateJogadoreDto: UpdateJogadoreDto) {
+    return await this.prisma.jogador.update({data: updateJogadoreDto, where:{CPF:cpf}})
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} jogadore`;
+  async remove(cpf: string) {
+    return await this.prisma.jogador.delete({where: {CPF: cpf}})
   }
 }

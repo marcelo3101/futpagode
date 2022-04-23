@@ -17,18 +17,18 @@ export class JogadoresController {
     return this.jogadoresService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.jogadoresService.findOne(+id);
+  @Get(':cpf')
+  findOne(@Param('cpf') cpf: string) {
+    return this.jogadoresService.findOne(cpf);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateJogadoreDto: UpdateJogadoreDto) {
-    return this.jogadoresService.update(+id, updateJogadoreDto);
+  @Patch(':cpf')
+  update(@Param('cpf') cpf: string, @Body() updateJogadoreDto: UpdateJogadoreDto) {
+    return this.jogadoresService.update(cpf, updateJogadoreDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.jogadoresService.remove(+id);
+  @Delete(':cpf')
+  remove(@Param('cpf') cpf: string) {
+    return this.jogadoresService.remove(cpf);
   }
 }
