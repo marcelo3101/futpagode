@@ -22,6 +22,11 @@ export class JogadoresController {
     return this.jogadoresService.findOne(cpf);
   }
 
+  @Post('/login')
+  login(@Body() data: {cpf: string}) {
+    return this.jogadoresService.findOne(data.cpf);
+  }
+
   @Patch(':cpf')
   update(@Param('cpf') cpf: string, @Body() updateJogadoreDto: UpdateJogadoreDto) {
     return this.jogadoresService.update(cpf, updateJogadoreDto);
