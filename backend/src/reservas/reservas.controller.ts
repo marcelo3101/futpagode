@@ -22,6 +22,11 @@ export class ReservasController {
     return this.reservasService.findOne(+id);
   }
 
+  @Get('criou/:cpf')
+  findByUser(@Param('cpf') cpf: string) {
+    return this.reservasService.findByUser(cpf);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateReservaDto: UpdateReservaDto) {
     return this.reservasService.update(+id, updateReservaDto);

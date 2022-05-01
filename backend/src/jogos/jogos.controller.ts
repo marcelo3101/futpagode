@@ -6,9 +6,7 @@ import { EnterJogoDto } from './dto/enter_jogo.dto';
 
 @Controller('jogos')
 export class JogosController {
-  constructor(private readonly jogosService: JogosService) {
-    console.log("jogos")
-  }
+  constructor(private readonly jogosService: JogosService) {}
 
   @Post()
   create(@Body() createJogoDto: CreateJogoDto) {
@@ -16,8 +14,17 @@ export class JogosController {
   }
 
   @Post("enter")
-  enterGame(@Body() enterJogoDto: EnterJogoDto ) {
+  enterJogo(@Body() enterJogoDto: EnterJogoDto ) {
     return this.jogosService.enterJogo(enterJogoDto);
+  }
+  
+  @Delete("quit/:cpf/:id")
+  quitJogo(@Param('cpf') cpf: string, @Param('id') id: string ) {
+    const data: EnterJogoDto = {
+      Jogador_CPF: cpf, 
+      Jogo_id: +id
+    }
+    return this.jogosService.quitJogo(data);
   }
 
   @Get()

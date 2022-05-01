@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { JogadoresService } from './jogadores.service';
 import { CreateJogadoreDto } from './dto/create-jogadore.dto';
 import { UpdateJogadoreDto } from './dto/update-jogadore.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 
 @Controller('jogadores')
 export class JogadoresController {
@@ -30,6 +32,24 @@ export class JogadoresController {
   @Patch(':cpf')
   update(@Param('cpf') cpf: string, @Body() updateJogadoreDto: UpdateJogadoreDto) {
     return this.jogadoresService.update(cpf, updateJogadoreDto);
+  }
+
+  @Post(":cpf/avatar")
+  @UseInterceptors(
+    FileInterceptor("photo", {
+      dest: "./uploads"
+    })
+  )
+  uploadAvatar(@Param('cpf') cpf: string, @UploadedFile() fileRef){
+    console.log(fileRef)
+    return this.jogadoresService.updateImage(fileRef, cpf)
+  }
+
+  @Get(":cpf/avatar")
+  async downLoadAvatar(@Param('cpf') cpf: string, @Res() response: Response){
+    const file = await this.jogadoresService.downloadImage(cpf)
+    response.set('Content-Type', 'image/*')
+    response.status(200).send(file)
   }
 
   @Delete(':cpf')

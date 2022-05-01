@@ -14,6 +14,10 @@ export class ReservasService {
     return await this.prisma.reserva.findMany()
   }
 
+  async findByUser(cpf: string){
+    return await this.prisma.reserva.findMany({where: {reservador_CPF: cpf}})
+  }
+
   async findOne(id: number) {
     return await this.prisma.reserva.findUnique({where: {id:id}})
   }

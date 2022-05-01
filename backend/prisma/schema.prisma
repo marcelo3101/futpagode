@@ -69,7 +69,7 @@ model Jogador {
   nome                     String                 @db.VarChar(45)
   data_de_nascimento       DateTime               @db.Date
   Ranking                  Int
-  foto                     Bytes?                 @db.Blob
+  foto                     Bytes?                 @db.LongBlob
   Ranking_JogadorToRanking Ranking                @relation(fields: [Ranking], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_Ranking1")
   Joga_em                  Joga_em[]
   Reserva                  Reserva[]
@@ -127,8 +127,8 @@ model Reserva {
   data_hora_termino DateTime @db.DateTime(0)
   Campo_id          Int
   reservador_CPF    String   @db.Char(11)
-  Campo             Campo    @relation(fields: [Campo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Reserva_Campo1")
-  Jogador           Jogador  @relation(fields: [reservador_CPF], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Reserva_Jogador1")
+  Campo             Campo    @relation(fields: [Campo_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Reserva_Campo1")
+  Jogador           Jogador  @relation(fields: [reservador_CPF], references: [CPF], onDelete: Cascade, onUpdate: NoAction, map: "fk_Reserva_Jogador1")
   Jogo              Jogo[]
 
   @@index([Campo_id], map: "fk_Reserva_Campo1_idx")
@@ -155,11 +155,11 @@ model Torneio {
   nome                                    String                 @db.VarChar(45)
   Ranking_minimo                          Int
   Ranking_maximo                          Int
-  Time_vencedor                           Int
+  Time_vencedor                           Int?
   formato                                 String                 @db.VarChar(45)
   Ranking_RankingToTorneio_Ranking_maximo Ranking                @relation("RankingToTorneio_Ranking_maximo", fields: [Ranking_maximo], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_Ranking2")
   Ranking_RankingToTorneio_Ranking_minimo Ranking                @relation("RankingToTorneio_Ranking_minimo", fields: [Ranking_minimo], references: [nivel], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_Ranking1")
-  Time                                    Time                   @relation(fields: [Time_vencedor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_Time1")
+  Time                                    Time?                 @relation(fields: [Time_vencedor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_Time1")
   formato_TorneioToformato                formato                @relation(fields: [formato], references: [nome], onDelete: NoAction, onUpdate: NoAction, map: "fk_Torneio_formato1")
   Participacao_Torneio                    Participacao_Torneio[]
 
@@ -198,8 +198,8 @@ model membro_de_time {
 model participacao_em_jogo {
   Jogador_CPF String  @db.Char(11)
   Jogo_id     Int
-  Jogador     Jogador @relation(fields: [Jogador_CPF], references: [CPF], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_has_Jogo_Jogador1")
-  Jogo        Jogo    @relation(fields: [Jogo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Jogador_has_Jogo_Jogo1")
+  Jogador     Jogador @relation(fields: [Jogador_CPF], references: [CPF], onDelete: Cascade, onUpdate: NoAction, map: "fk_Jogador_has_Jogo_Jogador1")
+  Jogo        Jogo    @relation(fields: [Jogo_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Jogador_has_Jogo_Jogo1")
 
   @@id([Jogador_CPF, Jogo_id])
   @@index([Jogador_CPF], map: "fk_Jogador_has_Jogo_Jogador1_idx")

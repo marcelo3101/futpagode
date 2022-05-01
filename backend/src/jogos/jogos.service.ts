@@ -15,6 +15,11 @@ export class JogosService {
     return await this.prisma.participacao_em_jogo.create({data: enterJogoDto})
   }
 
+  async quitJogo(enterJogoDto: EnterJogoDto){
+    return await this.prisma.participacao_em_jogo.delete({where: {Jogador_CPF_Jogo_id: enterJogoDto
+    }})
+  }
+
   async jogosJogador(cpf: string) {
     const sql = `
       select * from Jogo
@@ -36,7 +41,7 @@ export class JogosService {
   }
 
   async findAll() {
-    return await this.prisma.jogo.findMany()
+    return await this.prisma.jogo.findMany({include:{participacao_em_jogo: true}})
   }
 
   async findOne(id: number) {

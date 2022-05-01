@@ -9,4 +9,5 @@ export class UpdateJogadoreDto extends PartialType(CreateJogadoreDto) {
   @IsDate()
   data_de_nascimento: Date
   Ranking: number
+  foto?: Buffer
 }
