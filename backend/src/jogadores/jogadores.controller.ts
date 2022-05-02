@@ -41,7 +41,6 @@ export class JogadoresController {
     })
   )
   uploadAvatar(@Param('cpf') cpf: string, @UploadedFile() fileRef){
-    console.log(fileRef)
     return this.jogadoresService.updateImage(fileRef, cpf)
   }
 

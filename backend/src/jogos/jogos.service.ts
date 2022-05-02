@@ -11,13 +11,11 @@ export class JogosService {
     return await this.prisma.jogo.create({data:createJogoDto})
   }
 
-  async enterJogo(enterJogoDto: EnterJogoDto) {
-    return await this.prisma.participacao_em_jogo.create({data: enterJogoDto})
-  }
-
-  async quitJogo(enterJogoDto: EnterJogoDto){
-    return await this.prisma.participacao_em_jogo.delete({where: {Jogador_CPF_Jogo_id: enterJogoDto
-    }})
+  async enterOrQuitJogo({Jogador_CPF, Jogo_id}: EnterJogoDto) {
+    const sql = `
+    call InscreverOuDesinscreverJogadorEmJogo('${Jogador_CPF}', ${Jogo_id});
+    `
+    return await this.prisma.$queryRawUnsafe(sql)
   }
 
   async jogosJogador(cpf: string) {
@@ -42,6 +40,13 @@ export class JogosService {
 
   async findAll() {
     return await this.prisma.jogo.findMany({include:{participacao_em_jogo: true}})
+  }
+
+  async jogosComCriador() {
+    const sql = `
+    select * from jogo_com_criador;
+    `
+    return await this.prisma.$queryRawUnsafe(sql)
   }
 
   async findOne(id: number) {

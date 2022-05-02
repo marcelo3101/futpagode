@@ -15,7 +15,7 @@ export class JogosController {
 
   @Post("enter")
   enterJogo(@Body() enterJogoDto: EnterJogoDto ) {
-    return this.jogosService.enterJogo(enterJogoDto);
+    return this.jogosService.enterOrQuitJogo(enterJogoDto);
   }
   
   @Delete("quit/:cpf/:id")
@@ -24,12 +24,17 @@ export class JogosController {
       Jogador_CPF: cpf, 
       Jogo_id: +id
     }
-    return this.jogosService.quitJogo(data);
+    return this.jogosService.enterOrQuitJogo(data);
   }
 
   @Get()
   findAll() {
     return this.jogosService.findAll();
+  }
+
+  @Get('/withcreator')
+  findWithCreator() {
+    return this.jogosService.jogosComCriador();
   }
 
   @Get(':id')
